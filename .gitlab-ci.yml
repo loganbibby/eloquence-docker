@@ -1,0 +1,2 @@
+include:
+  - component: $CI_SERVER_FQDN/core/docker-image-builder/build@1.0.0
