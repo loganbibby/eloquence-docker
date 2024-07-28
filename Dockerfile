@@ -4,8 +4,8 @@ ENV ELOQ_PACKAGE=b0830
 ENV ELOQ_VERSION=8.3
 
 # Specifying handy vars
-ENV ELOQ_CFG="/etc/opt/eloquence/$ELOQ_VERSION/eloqdb.cfg"
 ENV ELOQ_DIR=/var/lib/eloquence
+ENV ELOQ_CFG="$ELOQ_DIR/eloqdb.cfg"
 ENV ELOQ_DATA_DIR="$ELOQ_DIR/data"
 ENV ELOQ_USER=eloqdb
 
@@ -22,28 +22,36 @@ RUN apt update && \
     apt update
 
 # Install Eloquence
-RUN apt install -y eloquence.${ELOQ_PACKAGE}
+RUN apt install -y eloquence.${ELOQ_PACKAGE} && \
+    cp /etc/opt/eloquence/$ELOQ_VERSION/eloqdb.cfg /etc/opt/eloquence/$ELOQ_VERSION/eloqdb.cfg.orig
 
 # Create user
 RUN useradd $ELOQ_USER -s /bin/bash
 
-USER eloqdb
-
-# Create directories and set permissions
 RUN mkdir -p $ELOQ_DATA_DIR && \
-    mkdir -p $ELOQ_LOGS_DIR && \
-    mkdir /docker-entrypoint.d
+    mkdir -p $(dirname -- "$ELOQ_CFG") && \
+    chown -R $ELOQ_USER:$ELOQ_USER $ELOQ_DIR && \
+    mkdir -p /docker-entrypoint.d && \
+    chown $ELOQ_USER:$ELOQ_USER /docker-entrypoint.d
 
 # Send log messages to Docker
-RUN ln -sf /dev/stdout /var/logs/eloquence.log
+RUN ln -sf /dev/stdout /var/log/eloquence.log
 
-COPY files/eloqdb.cfg $ELOQ_CFG
+# Make synlink to config file so -c doesn't need to be used
+RUN touch $ELOQ_CFG && \
+    ln -sf $ELOQ_CFG /etc/opt/eloquence/$ELOQ_VERSION/eloqdb.cfg && \
+    chown $ELOQ_USER:$ELOQ_USER /etc/opt/eloquence/$ELOQ_VERSION/eloqdb.cfg
+
+USER eloqdb
+
 COPY --chmod=755 entrypoint/docker-entrypoint.sh /
+COPY --chmod=755 entrypoint/00-create-cfg-file.sh /docker-entrypoint.d
+COPY --chmod=755 entrypoint/01-create-root-volume.sh /docker-entrypoint.d
 
 EXPOSE 8102
 
-VOLUME "$ELOQ_DATA_DIR"
+VOLUME $ELOQ_DIR
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
 
-CMD ["eloqdb" "-f"]
+CMD ["eloqdb", "-f"]
