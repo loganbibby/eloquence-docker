@@ -57,3 +57,4 @@ If the file specified in `ELOQ_CFG` is not blank, `00-create-cfg-file.sh` will n
 ## Versions
 
 * **1.0.0**: Initial release
+* **1.1.0**: Added ability to specify Eloquence license 
