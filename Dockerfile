@@ -32,7 +32,8 @@ RUN mkdir -p $ELOQ_DATA_DIR && \
     mkdir -p $(dirname -- "$ELOQ_CFG") && \
     chown -R $ELOQ_USER:$ELOQ_USER $ELOQ_DIR && \
     mkdir -p /docker-entrypoint.d && \
-    chown $ELOQ_USER:$ELOQ_USER /docker-entrypoint.d
+    chown $ELOQ_USER:$ELOQ_USER /docker-entrypoint.d && \
+    chown -R $ELOQ_USER:$ELOQ_USER /etc/opt/eloquence/$ELOQ_VERSION
 
 # Send log messages to Docker
 RUN ln -sf /dev/stdout /var/log/eloquence.log
@@ -44,9 +45,7 @@ RUN touch $ELOQ_CFG && \
 
 USER eloqdb
 
-COPY --chmod=755 entrypoint/docker-entrypoint.sh /
-COPY --chmod=755 entrypoint/00-create-cfg-file.sh /docker-entrypoint.d
-COPY --chmod=755 entrypoint/01-create-root-volume.sh /docker-entrypoint.d
+COPY --chmod=755 /docker /
 
 EXPOSE 8102
 

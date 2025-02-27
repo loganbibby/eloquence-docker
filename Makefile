@@ -2,6 +2,6 @@ build:
 	docker build -t eloquence .
 
 run:
-	docker run --rm eloquence
+	docker run --env-file .env --rm eloquence
 
 build_and_run: build run
