@@ -37,6 +37,7 @@ docker run \
 * `ELOQ_DIR`: Primary directory for Eloquence data (defaults to `/var/lib/eloquence`)
 * `ELOQ_DATA_DIR`: Directory for Eloquence database data (defaults to `$ELOQ_DIR/data`)
 * `ELOQ_CFG`: Location of the configuration file (defaults to `$ELOQ_DIR/eloqdb.cfg`)
+* `ELOQ_LICENSE`: Base64-encoded Eloquence license(s)
 
 ## Custom configuration file
 
