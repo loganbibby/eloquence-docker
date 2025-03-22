@@ -32,8 +32,8 @@ RUN mkdir -p /docker-entrypoint.d && \
     chown $ELOQ_USER:$ELOQ_USER ${ELOQ_DATA_DIR}
 
 # Copy configuration file
-COPY ./docker/files/eloqdb.cfg /etc/eloquence/$ELOQ_VERSION/eloqdb.cfg
-RUN chown $ELOQ_USER:$ELOQ_USER /etc/eloquence/$ELOQ_VERSION/eloqdb.cfg
+COPY ./docker/files/eloqdb.cfg /etc/opt/eloquence/$ELOQ_VERSION/eloqdb.cfg
+RUN chown $ELOQ_USER:$ELOQ_USER /etc/opt/eloquence/$ELOQ_VERSION/eloqdb.cfg
 
 USER eloqdb
 
