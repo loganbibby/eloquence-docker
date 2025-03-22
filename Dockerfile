@@ -40,14 +40,12 @@ COPY --chmod=755 ./docker/files/eloqdb.cfg /etc/opt/eloquence/$ELOQ_VERSION/eloq
 RUN chown $ELOQ_USER:$ELOQ_USER /etc/opt/eloquence/$ELOQ_VERSION/eloqdb.cfg
 
 # Copy entrypoint files
-COPY --chmod=755 ./docker/docker-entrypoint.d /docker-entrypoint.d
+COPY --chmod=755 ./docker/docker-entrypoint.d/* /docker-entrypoint.d/
 RUN chown -R $ELOQ_USER:$ELOQ_USER /docker-entrypoint.d/
 
 # Copy entrypoint
 COPY --chmod=755 ./docker/docker-entrypoint.sh /docker-entrypoint.sh
 RUN chown $ELOQ_USER:$ELOQ_USER /docker-entrypoint.sh
-
-USER eloqdb
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
 
