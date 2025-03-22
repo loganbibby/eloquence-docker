@@ -1,5 +1,8 @@
 FROM debian:bookworm AS base
 
+VOLUME /var/opt/eloquence/db/
+EXPOSE 8102
+
 ENV ELOQ_PACKAGE=b0830
 ENV ELOQ_VERSION=8.3
 
@@ -9,6 +12,9 @@ ENV ELOQ_USER=eloqdb
 
 # Add Eloquence's bin to the path
 ENV PATH="$PATH:/opt/eloquence/$ELOQ_VERSION/bin"
+
+# Create user
+RUN useradd $ELOQ_USER -s /bin/bash
 
 # Add Eloquence Debian repository
 RUN apt update && \
@@ -22,8 +28,6 @@ RUN apt update && \
 # Install Eloquence
 RUN apt install -y eloquence.${ELOQ_PACKAGE}
 
-# Create user
-RUN useradd $ELOQ_USER -s /bin/bash
 
 RUN mkdir -p /docker-entrypoint.d && \
     chown $ELOQ_USER:$ELOQ_USER /docker-entrypoint.d && \
@@ -32,16 +36,18 @@ RUN mkdir -p /docker-entrypoint.d && \
     chown $ELOQ_USER:$ELOQ_USER ${ELOQ_DATA_DIR}
 
 # Copy configuration file
-COPY ./docker/files/eloqdb.cfg /etc/opt/eloquence/$ELOQ_VERSION/eloqdb.cfg
+COPY --chmod=755 ./docker/files/eloqdb.cfg /etc/opt/eloquence/$ELOQ_VERSION/eloqdb.cfg
 RUN chown $ELOQ_USER:$ELOQ_USER /etc/opt/eloquence/$ELOQ_VERSION/eloqdb.cfg
 
+# Copy entrypoint files
+COPY ./docker/docker-entrypoint.d /docker-entrypoint.d
+RUN chown -R $ELOQ_USER:$ELOQ_USER /docker-entrypoint.d/
+
+# Copy entrypoint
+COPY ./docker/docker-entrypoint.sh /docker-entrypoint.sh
+RUN chown $ELOQ_USER:$ELOQ_USER /docker-entrypoint.sh
+
 USER eloqdb
-
-COPY --chmod=755 /docker /
-
-EXPOSE 8102
-
-VOLUME /var/opt/eloquence/db/
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
 
