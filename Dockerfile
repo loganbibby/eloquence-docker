@@ -12,7 +12,7 @@ ENV PATH="$PATH:/opt/eloquence/$ELOQ_VERSION/bin"
 
 # Add Eloquence Debian repository
 RUN apt update && \
-    apt install -y wget openssl && \
+    apt install -y wget openssl nano && \
     cd /etc/apt/sources.list.d && \
     wget https://marxmeier.com/download/repo/deb/eloquence.list && \
     wget -O /etc/apt/trusted.gpg.d/eloquence.asc \
@@ -33,6 +33,7 @@ RUN mkdir -p /docker-entrypoint.d && \
 
 # Copy configuration file
 COPY ./docker/files/eloqdb.cfg /etc/eloquence/$ELOQ_VERSION/eloqdb.cfg
+RUN chown $ELOQ_USER:$ELOQ_USER /etc/eloquence/$ELOQ_VERSION/eloqdb.cfg
 
 USER eloqdb
 
